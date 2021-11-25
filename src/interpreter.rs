@@ -1,12 +1,14 @@
 use std::io::*;
-use std::time::{Duration, Instant};
+use std::time::{Instant};
 
+
+const DATA_SIZE: usize = 512000; 
 
 pub fn interpret(input: String) {
 	println!("interpreter running!");
 	let start = Instant::now();
-	let mut data: [u8; 60000] = [0; 60000];
-	let mut pointer = 0;
+	let mut data: [u8; DATA_SIZE] = [0; DATA_SIZE];
+	let mut pointer: usize = DATA_SIZE/2;
 	let mut char_index = 0;
 	while char_index < input.chars().count() {
 		let char_ = input.chars().nth(char_index).unwrap(); 
@@ -90,10 +92,6 @@ pub fn interpret(input: String) {
 				char_index = pos;
 				//println!("jumped to {}", input.chars().nth(pos).unwrap());
 			}
-		}
-		else if char_ != '\n'{
-			println!("An interpretation error occured!");
-			break;
 		}
 		char_index += 1;
 	}
