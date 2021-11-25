@@ -1,8 +1,11 @@
 use std::io::*;
+use std::time::{Duration, Instant};
+
 
 pub fn interpret(input: String) {
 	println!("interpreter running!");
-	let mut data: Vec<u8> = vec![0];
+	let start = Instant::now();
+	let mut data: [u8; 60000] = [0; 60000];
 	let mut pointer = 0;
 	let mut char_index = 0;
 	while char_index < input.chars().count() {
@@ -33,39 +36,66 @@ pub fn interpret(input: String) {
 			data[pointer] = input.unwrap();
 		} 
 		else if char_ == '>' {
-			if data.len() == pointer+1 {
-				data.push(0);
-				pointer += 1;
-			}
+			pointer += 1;
 		} 
 		else if char_ == '<' {
-			data.insert(0, 0);
+			pointer -= 1;
+		}
+		else if char_ == '[' {
+			if data[pointer] == 0 {
+				let mut pos = char_index;
+				let mut left = 0; // number of left brackets
+				let mut right = 0; // number of right brackets
+
+				loop {
+					let current_char = input.chars().nth(pos).unwrap();
+					
+					if current_char == ']' {
+						right += 1;
+					}
+					else if current_char == '[' {
+						left += 1;
+					}
+
+					if current_char == ']' && left == right {
+						break;
+					}
+					pos += 1;
+				}
+				char_index = pos;
+				//println!("jumped to {}", input.chars().nth(pos).unwrap());
+			}
 		}
 		else if char_ == ']' {
-			println!("found ]");
 			if data[pointer] != 0 {
-				let mut pos: usize = char_index-1;
-				let mut code = String::from("fdsfds ");
-				println!("found ]");
-				
-				while input.chars().nth(pos).unwrap() != '[' {
+				let mut pos = char_index;
+				let mut left = 0; // number of left brackets
+				let mut right = 0; // number of right brackets
 
-					code.push(input.chars().nth(pos).unwrap());
-					if pos == 0 {
+				loop {
+					let current_char = input.chars().nth(pos).unwrap();
+					
+					if current_char == ']' {
+						right += 1;
+					}
+					else if current_char == '[' {
+						left += 1;
+					}
+
+					if current_char == '[' && left == right {
 						break;
 					}
 					pos -= 1;
 				}
-				println!("code: {}", code);
-				let code_inv: String = code.chars().rev().collect();
-				println!("code inv: {}", code_inv);
 				char_index = pos;
+				//println!("jumped to {}", input.chars().nth(pos).unwrap());
 			}
-		} 
-		else if char_ != '[' && char_ != '\n'{
+		}
+		else if char_ != '\n'{
 			println!("An interpretation error occured!");
 			break;
 		}
 		char_index += 1;
 	}
+	println!("\ninterpreter finished in {:?}", start.elapsed());
 }

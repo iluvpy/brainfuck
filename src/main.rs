@@ -25,5 +25,4 @@ fn main() {
 	
 	interpreter::interpret(content);
 
-
 }
